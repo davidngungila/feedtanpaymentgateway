@@ -1687,6 +1687,9 @@ Route::post('/settings/test-messaging', function(\Illuminate\Http\Request $reque
 })->name('settings.test-messaging');
 
 // Account & Profile - Full system live DB with avatar
+Route::get('/profile/edit', function(){
+    return app(\App\Http\Controllers\ProfileController::class)->editPage();
+})->name('profile.edit');
 Route::get('/profile', function(\Illuminate\Http\Request $request){
     $user = auth()->user() ?? mockUser();
     // Try live DB

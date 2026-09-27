@@ -31,6 +31,14 @@ class ProfileController extends Controller
         ]);
     }
 
+    /**
+     * Standalone edit page with plain form posts (no JavaScript required).
+     */
+    public function editPage(): View
+    {
+        return view('profile.edit', ['user' => auth()->user()]);
+    }
+
     public function update(Request $request): JsonResponse|RedirectResponse
     {
         $user = auth()->user();

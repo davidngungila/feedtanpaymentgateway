@@ -8,6 +8,9 @@
             <h2>My Profile</h2>
             <p class="sub">Update your personal information and change your password.</p>
         </div>
+        <div class="view-actions">
+            <a class="btn btn-primary" href="{{ route('profile.edit') }}" style="text-decoration:none;">Edit profile</a>
+        </div>
     </div>
 
     <div class="panel" style="margin-bottom:24px;">
@@ -108,7 +111,6 @@
                 <div class="detail-item"><div class="dk">Member since</div><div class="dv">{{ $user->created_at->format('d M Y') }} · {{ $user->created_at->diffForHumans() }}</div></div>
                 <div class="detail-item"><div class="dk">Last login</div><div class="dv">{{ $user->last_login_at?->format('d M Y H:i') ?? 'Never' }}@if($user->last_login_at) · {{ $user->last_login_at->diffForHumans() }}@endif</div></div>
                 <div class="detail-item"><div class="dk">Current IP</div><div class="dv">{{ $currentIp ?? '—' }}</div></div>
-                <div class="detail-item"><div class="dk">Linked cash point</div><div class="dv">{{ $user->agent?->name ?? '—' }}</div></div>
             </div>
         </div>
     </div>
