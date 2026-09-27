@@ -27,12 +27,11 @@
         *{box-sizing:border-box;}
         body{
             margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
-            font-family:'Raleway',sans-serif;background:var(--coffee-900);
-            background-image:radial-gradient(circle at 85% 15%, rgba(212,162,76,.16), transparent 45%), radial-gradient(circle at 10% 90%, rgba(194,89,43,.18), transparent 45%);
+            font-family:'Raleway',sans-serif;background:#FFFFFF;
             padding:24px;color:var(--ink);
         }
         .login-card{
-            width:100%;max-width:420px;background:var(--sand-50);border-radius:var(--radius-lg);
+            width:100%;max-width:420px;background:var(--white);border:1px solid var(--line);border-radius:var(--radius-lg);
             box-shadow:var(--shadow-lg);padding:40px 38px;animation:riseIn .4s cubic-bezier(.2,.8,.2,1);
         }
         @keyframes riseIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
