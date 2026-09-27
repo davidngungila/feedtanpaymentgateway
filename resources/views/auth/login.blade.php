@@ -91,7 +91,7 @@
             </div>
         </div>
         <h1>Welcome back</h1>
-        <p class="sub">Sign in to the collections control room.<br>Protected accounts continue to two-factor verification.</p>
+        <p class="sub">Sign in to the collections control room.</p>
 
         <form id="loginForm" method="POST" action="{{ route('login') }}">
             @csrf
@@ -104,9 +104,6 @@
                 <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
             </div>
             <button type="submit" class="btn" id="loginBtn">Sign in securely</button>
-            <label style="display:flex;align-items:center;gap:8px;margin-top:14px;font-size:13px;color:var(--ink-soft);cursor:pointer;">
-                <input type="checkbox" name="remember" value="1" style="width:auto;accent-color:var(--terracotta-600);"> Keep me signed in on this device
-            </label>
         </form>
 
         <p class="foot">M-Pesa · Airtel Money · Mixx by Yas · HaloPesa · T-Pesa</p>
