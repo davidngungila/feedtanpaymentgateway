@@ -6,28 +6,32 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 
-function mockPaginator(array $items, int $perPage = 15): LengthAwarePaginator {
-    $page = LengthAwarePaginator::resolveCurrentPage() ?: 1;
-    $collection = collect($items);
-    $results = $collection->slice(($page - 1) * $perPage, $perPage)->values();
-    return new LengthAwarePaginator($results, $collection->count(), $perPage, $page, [
-        'path' => LengthAwarePaginator::resolveCurrentPath(),
-        'query' => request()->query(),
-    ]);
+if (! function_exists('mockPaginator')) {
+    function mockPaginator(array $items, int $perPage = 15): LengthAwarePaginator {
+        $page = LengthAwarePaginator::resolveCurrentPage() ?: 1;
+        $collection = collect($items);
+        $results = $collection->slice(($page - 1) * $perPage, $perPage)->values();
+        return new LengthAwarePaginator($results, $collection->count(), $perPage, $page, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'query' => request()->query(),
+        ]);
+    }
 }
 
-function mockUser($role = 'admin') {
-    return new class($role) {
-        public $id=1; public $name; public $email; public $phone='+255 714 000 001'; public $role; public $agent; public $agent_id=1; public $is_active=true; public $two_factor_enabled; public $last_login_at; public $created_at; public $updated_at; public $profile_photo_path=null;
-        public function __construct($role){ $this->role=$role; $this->name = $role==='admin' ? 'Admin User' : ($role==='supervisor' ? 'Supervisor' : 'Cashier'); $this->email=$role.'@clickpesa.co.tz'; $this->two_factor_enabled=$role==='admin'; $this->last_login_at=now()->subMinutes(5); $this->created_at=now()->subDays(30); $this->updated_at=now(); $this->agent=(object)['name'=>'Main Branch','code'=>'CP001']; }
-        public function avatarUrl(){ return ''; }
-        public function getRouteKey(){
-            $id = (string)$this->id;
-            $sig = hash_hmac('sha256', $id, (string)config('app.key'));
-            $payload = $id . ':' . $sig;
-            return rtrim(strtr(base64_encode($payload), '+/', '-_'), '=');
-        }
-    };
+if (! function_exists('mockUser')) {
+    function mockUser($role = 'admin') {
+        return new class($role) {
+            public $id=1; public $name; public $email; public $phone='+255 714 000 001'; public $role; public $agent; public $agent_id=1; public $is_active=true; public $two_factor_enabled; public $last_login_at; public $created_at; public $updated_at; public $profile_photo_path=null;
+            public function __construct($role){ $this->role=$role; $this->name = $role==='admin' ? 'Admin User' : ($role==='supervisor' ? 'Supervisor' : 'Cashier'); $this->email=$role.'@clickpesa.co.tz'; $this->two_factor_enabled=$role==='admin'; $this->last_login_at=now()->subMinutes(5); $this->created_at=now()->subDays(30); $this->updated_at=now(); $this->agent=(object)['name'=>'Main Branch','code'=>'CP001']; }
+            public function avatarUrl(){ return ''; }
+            public function getRouteKey(){
+                $id = (string)$this->id;
+                $sig = hash_hmac('sha256', $id, (string)config('app.key'));
+                $payload = $id . ':' . $sig;
+                return rtrim(strtr(base64_encode($payload), '+/', '-_'), '=');
+            }
+        };
+    }
 }
 
 Route::get('/', function(){ if(auth()->check()) return redirect()->route('dashboard'); return redirect()->route('payments.public'); });
