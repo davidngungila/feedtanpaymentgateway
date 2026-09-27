@@ -95,7 +95,6 @@
                 <tr>
                     <th>User</th>
                     <th>Role</th>
-                    <th>Cash point</th>
                     <th>Phone</th>
                     <th>2FA</th>
                     <th>Status</th>
@@ -121,10 +120,6 @@
                             </div>
                         </td>
                         <td><span class="tag {{ $user->role==='admin' ? 'tag-gold' : ($user->role==='supervisor' ? 'tag-green' : 'tag-terracotta') }}">{{ ucfirst($user->role) }}</span></td>
-                        <td>
-                            <div class="cell-title">{{ $user->agent?->name ?? '—' }}</div>
-                            <div class="cell-sub">{{ $user->agent?->code ?? 'No link' }}</div>
-                        </td>
                         <td>{{ $user->phone ?? '—' }}</td>
                         <td>
                             @if($user->two_factor_enabled)
@@ -209,14 +204,8 @@
                         </select>
                     </div>
                 </div>
-                <div class="field" id="agentFieldWrap">
-                    <label>Linked cash point</label>
-                    <select name="agent_id" id="userAgentId">
-                        <option value="">— Not linked —</option>
-                        @foreach ($agents as $agent)
-                            <option value="{{ $agent->id }}">{{ $agent->name }} ({{ $agent->code }})</option>
-                        @endforeach
-                    </select>
+                <div class="field" id="agentFieldWrap" style="display:none;">
+                    <input type="hidden" name="agent_id" id="userAgentId" value="">
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:12px;background:var(--sand-50);border:1px solid var(--line);border-radius:10px;margin-top:4px;">
                     <div>
@@ -388,7 +377,6 @@
             ['Name', tr.dataset.name],
             ['Email', tr.dataset.email],
             ['Role', { __html: roleTag }],
-            ['Cash point', tr.dataset.agent ? tr.dataset.agent + ' (' + tr.dataset.agentcode + ')' : '—'],
             ['Phone', tr.dataset.phone || '—'],
             ['2FA', {__html: tr.dataset['2fa']==='1' ? '<span class="tag tag-green">On</span>' : '<span class="tag tag-red">Off</span>'}],
             ['Status', { __html: tr.dataset.active === '1' ? '<span class="tag tag-green">Active</span>' : '<span class="tag tag-grey">Disabled</span>' }],
