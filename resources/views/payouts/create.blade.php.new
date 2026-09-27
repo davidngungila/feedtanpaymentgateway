@@ -1,0 +1,387 @@
+@extends('layouts.app')
+
+@section('title', 'New Payout')
+
+@section('head')
+<style>
+    .payout-hero{background:linear-gradient(135deg,var(--coffee-900) 0%, var(--coffee-700) 40%, #5E6E3F 100%);border-radius:20px;padding:28px;color:#fff;position:relative;overflow:hidden;margin-bottom:20px;}
+    .payout-hero::before{content:"";position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle, rgba(212,162,76,.22), transparent 70%);}
+    .payout-hero::after{content:"";position:absolute;left:30%;bottom:-30px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle, rgba(255,255,255,.06), transparent 70%);}
+    .hero-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:20px;align-items:center;position:relative;z-index:1;}
+    .hero-title{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px;}
+    .hero-sub{font-size:14px;opacity:.85;line-height:1.6;margin:0;}
+    .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .hero-stat{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.15);border-radius:14px;padding:14px;}
+    .hero-stat span{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.7;display:block;}
+    .hero-stat b{font-size:18px;display:block;margin-top:4px;}
+    .method-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+    .method-card{background:var(--white);border:1.5px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;transition:all .2s;text-align:center;position:relative;}
+    .method-card:hover{border-color:var(--terracotta-500);transform:translateY(-1px);box-shadow:var(--shadow-md);}
+    .method-card.active{border-color:var(--terracotta-600);background:var(--terracotta-100);box-shadow:0 4px 12px rgba(194,89,43,.15);}
+    .method-card.active::after{content:"✓";position:absolute;top:10px;right:10px;width:20px;height:20px;border-radius:50%;background:var(--terracotta-600);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;}
+    .method-card .ico{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:20px;}
+    .method-card[data-method="simu"] .ico{background:var(--acacia-100);color:var(--acacia-600);}
+    .method-card[data-method="bank"] .ico{background:var(--gold-100);color:#8a6418;}
+    .method-card[data-method="lipa"] .ico{background:var(--terracotta-100);color:var(--terracotta-600);}
+    .method-card b{display:block;font-size:14px;color:var(--coffee-900);margin-bottom:4px;}
+    .method-card span{font-size:11.5px;color:var(--ink-soft);line-height:1.4;display:block;}
+    .form-card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:24px;box-shadow:var(--shadow-sm);}
+    .balance-card{background:linear-gradient(135deg,var(--coffee-900),var(--coffee-700));color:#fff;border-radius:16px;padding:20px;position:relative;overflow:hidden;}
+    .balance-card::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(212,162,76,.18);}
+    .section-label{display:flex;align-items:center;gap:10px;margin:20px 0 14px;padding-bottom:10px;border-bottom:1px solid var(--line);}
+    .section-label::before{content:"";width:3px;height:18px;border-radius:3px;background:var(--gold-500);flex:none;}
+    .section-label h4{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--coffee-700);}
+    .verify-box{margin-top:8px;padding:10px 12px;border-radius:10px;font-size:12.5px;display:none;align-items:center;gap:8px;}
+    .verify-box.ok{background:var(--acacia-100);color:var(--acacia-600);border:1px solid var(--acacia-500);}
+    .verify-box.err{background:var(--danger-100);color:var(--danger);border:1px solid var(--danger);}
+    @media (max-width:900px){ .hero-grid{grid-template-columns:1fr;} .method-cards{grid-template-columns:1fr;} }
+</style>
+@endsection
+
+@section('content')
+<div class="view-head">
+    <div>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <a href="{{ route('payouts.index') }}" class="btn btn-ghost btn-sm">← Back to payouts</a>
+            <span class="tag tag-gold">Live · ClickPesa</span>
+        </div>
+        <h2 style="margin-top:10px;">New Payout</h2>
+        <p class="sub">Create a new disbursement — funds validated live against ClickPesa balance via preview APIs.</p>
+    </div>
+</div>
+
+<div class="payout-hero">
+    <div class="hero-grid">
+        <div>
+            <div class="hero-title">Send Money with Confidence</div>
+            <p class="hero-sub">Choose your payout method below. Each method verifies the beneficiary live via ClickPesa before submission. Cashier initiates, Supervisor/Admin approves.</p>
+            <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
+                <span class="tag" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);backdrop-filter:blur(4px);">✓ Live balance check</span>
+                <span class="tag" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);">✓ Name verification</span>
+                <span class="tag" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.2);">✓ 4-eyes approval</span>
+            </div>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat"><span>Available</span><b>@money($balances['available'] ?? 3420000)</b></div>
+            <div class="hero-stat"><span>Daily limit</span><b>@money($limits['daily'] ?? 50000000)</b></div>
+            <div class="hero-stat"><span>Per transaction max</span><b>@money($limits['per_txn'] ?? 10000000)</b></div>
+            <div class="hero-stat"><span>Approval threshold</span><b>@money($limits['approval_threshold'] ?? 1000000)</b></div>
+        </div>
+    </div>
+</div>
+
+<div class="method-cards">
+    <div class="method-card active" data-method="simu" onclick="switchPayoutTab('simu')">
+        <div class="ico">📱</div>
+        <b>Namba ya Simu</b>
+        <span>Mobile Money<br>ClickPesa · Verify via<br>preview-mobile-money</span>
+    </div>
+    <div class="method-card" data-method="bank" onclick="switchPayoutTab('bank')">
+        <div class="ico">🏦</div>
+        <b>Bank</b>
+        <span>Bank Transfer<br>ClickPesa · Verify via<br>preview-bank-payout</span>
+    </div>
+    <div class="method-card" data-method="lipa" onclick="switchPayoutTab('lipa')">
+        <div class="ico">💳</div>
+        <b>Lipa Namba</b>
+        <span>TIPS Lipa Namba<br>ClickPesa · Verify via<br>preview-lipa-namba</span>
+    </div>
+</div>
+
+{{-- Namba ya Simu Form --}}
+<form id="payoutFormSimu" method="POST" action="{{ route('payouts.store') }}" data-payout-form>
+    @csrf
+    <input type="hidden" name="method" value="mobile_money">
+    <input type="hidden" name="gateway" value="clickpesa">
+    <div style="display:grid;grid-template-columns:1.6fr .9fr;gap:18px;align-items:start;">
+        <div class="form-card">
+            <div class="section-label"><h4>Namba ya Simu — Mobile Money</h4></div>
+            <div class="form-row">
+                <div class="field">
+                    <label>Beneficiary name *</label>
+                    <input type="text" name="beneficiary_name" placeholder="e.g. Aisha Juma" required>
+                </div>
+                <div class="field">
+                    <label>Namba ya Simu *</label>
+                    <input type="text" name="beneficiary_phone" placeholder="+255 7xx xxx xxx" required>
+                </div>
+            </div>
+            <div class="field">
+                <label>Phone Number for ClickPesa verification *</label>
+                <div style="display:flex;gap:10px;">
+                    <input type="text" name="beneficiary_account" id="beneficiaryAccountSimu" placeholder="2557xxxxxxxx" required style="flex:1;">
+                    <button type="button" class="btn btn-ghost" onclick="verifyAccountSimu()" style="white-space:nowrap;flex:none;">Verify Name</button>
+                </div>
+                <div id="verifyResultSimu" class="verify-box"></div>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label>Network</label>
+                    <select name="network_id">
+                        <option value="">Auto (from account)</option>
+                        @foreach(($networks ?? []) as $n)
+                            <option value="{{ $n->id }}">{{ $n->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="field">
+                    <label>Account type</label>
+                    <select name="account_type">
+                        <option value="personal">Personal</option>
+                        <option value="business">Business / Till</option>
+                    </select>
+                </div>
+            </div>
+            <div class="section-label"><h4>Amount & Purpose</h4></div>
+            <div class="form-row">
+                <div class="field">
+                    <label>Amount (TZS) *</label>
+                    <input type="number" step="0.01" min="1000" name="amount" placeholder="500000" required>
+                    <div style="font-size:11px;color:var(--ink-soft);margin-top:6px;">Min @money(1000) · Max @money($limits['per_txn'] ?? 10000000) · Fee via live preview</div>
+                </div>
+                <div class="field">
+                    <label>Currency</label>
+                    <select name="currency">
+                        <option value="TZS">TZS</option>
+                        <option value="USD">USD</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label>Purpose *</label>
+                <select name="purpose" required>
+                    <option value="supplier_payment">Supplier payment</option>
+                    <option value="refund">Customer refund</option>
+                    <option value="salary">Salary</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Notes</label>
+                <textarea name="notes" rows="2" placeholder="Invoice reference, reason"></textarea>
+            </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:88px;">
+            <div class="form-card" style="background:var(--sand-50);">
+                <h4 style="margin:0 0 10px;font-size:13px;color:var(--coffee-900);">Live Preview</h4>
+                <div style="font-size:12.5px;color:var(--ink-soft);line-height:1.6;">
+                    Click <strong>Verify Name</strong> to validate the number live via <code style="background:var(--white);padding:2px 6px;border-radius:6px;">preview-mobile-money-payout</code> and auto-fill the name. Amount fee and balance are validated live against ClickPesa before submission.
+                </div>
+                <div style="margin-top:12px;padding:10px;background:var(--white);border-radius:8px;border:1px solid var(--line);font-size:12px;">
+                    <strong>Flow:</strong> Cashier initiates → <span style="color:var(--gold-500);font-weight:700;">Pending</span> → Supervisor/Admin approves → ClickPesa `create-*` live (if `?test=0`).
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;">Submit Namba ya Simu →</button>
+            <p style="font-size:11px;color:var(--ink-soft);text-align:center;margin:0;">Audit-logged · Encrypted ID</p>
+        </div>
+    </div>
+</form>
+
+{{-- Bank Form --}}
+<form id="payoutFormBank" method="POST" action="{{ route('payouts.store') }}" data-payout-form style="display:none;">
+    @csrf
+    <input type="hidden" name="method" value="bank">
+    <input type="hidden" name="gateway" value="clickpesa">
+    <div style="display:grid;grid-template-columns:1.6fr .9fr;gap:18px;align-items:start;">
+        <div class="form-card">
+            <div class="section-label"><h4>Bank Transfer — ClickPesa</h4></div>
+            <div class="field">
+                <label>Beneficiary name *</label>
+                <input type="text" name="beneficiary_name" placeholder="e.g. John Doe" required>
+            </div>
+            <div class="field">
+                <label>Account Number *</label>
+                <div style="display:flex;gap:10px;">
+                    <input type="text" name="beneficiary_account" id="beneficiaryAccountBank" placeholder="0152xxxxxxx" required style="flex:1;">
+                    <button type="button" class="btn btn-ghost" onclick="verifyAccountBank()" style="white-space:nowrap;">Verify Name</button>
+                </div>
+                <div id="verifyResultBank" class="verify-box"></div>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label>Bank *</label>
+                    <select name="bank_name" required>
+                        <option value="">Select bank</option>
+                        <option value="CRDB">CRDB Bank — CRDBTZTZ</option>
+                        <option value="NMB">NMB Bank — NMIBTZTZ</option>
+                        <option value="NBC">NBC — NMIBTZTZ</option>
+                        <option value="EQUITY">Equity Bank</option>
+                        <option value="ABSA">ABSA</option>
+                        <option value="DTB">DTB</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>BIC *</label>
+                    <input type="text" name="bic" placeholder="CRDBTZTZ" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label>Amount (TZS) *</label>
+                    <input type="number" step="0.01" min="1000" name="amount" placeholder="500000" required>
+                </div>
+                <div class="field">
+                    <label>Currency</label>
+                    <select name="currency"><option value="TZS">TZS</option><option value="USD">USD</option></select>
+                </div>
+            </div>
+            <div class="field">
+                <label>Notes</label>
+                <textarea name="notes" rows="2" placeholder="Invoice reference"></textarea>
+            </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:88px;">
+            <div class="form-card" style="background:var(--sand-50);">
+                <h4 style="margin:0 0 8px;font-size:13px;">Live Bank Preview</h4>
+                <div style="font-size:12px;color:var(--ink-soft);">Preview via <code style="background:var(--white);padding:2px 6px;border-radius:6px;">preview-bank-payout</code> validates BIC + account and returns `nameLookupStatus` + `fee`/`balance`.</div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;">Submit Bank Transfer →</button>
+        </div>
+    </div>
+</form>
+
+{{-- Lipa Namba Form --}}
+<form id="payoutFormLipa" method="POST" action="{{ route('payouts.store') }}" data-payout-form style="display:none;">
+    @csrf
+    <input type="hidden" name="method" value="lipa_namba">
+    <input type="hidden" name="gateway" value="clickpesa">
+    <div style="display:grid;grid-template-columns:1.6fr .9fr;gap:18px;align-items:start;">
+        <div class="form-card">
+            <div class="section-label"><h4>TIPS Lipa Namba — ClickPesa</h4></div>
+            <div class="field">
+                <label>Beneficiary name *</label>
+                <input type="text" name="beneficiary_name" placeholder="e.g. Shop Ltd" required>
+            </div>
+            <div class="form-row">
+                <div class="field">
+                    <label>Lipa Namba *</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="text" name="lipa_namba" id="beneficiaryAccountLipa" placeholder="48001268" required style="flex:1;">
+                        <button type="button" class="btn btn-ghost" onclick="verifyAccountLipa()" style="white-space:nowrap;">Verify</button>
+                    </div>
+                </div>
+                <div class="field">
+                    <label>Provider Code *</label>
+                    <input type="text" name="provider_code" placeholder="503" list="lipaProviders2">
+                    <datalist id="lipaProviders2">
+                        <option value="503">Vodacom M-Pesa — 503</option>
+                        <option value="504">Tigo Pesa</option>
+                    </datalist>
+                </div>
+            </div>
+            <div class="field">
+                <label>TanQR (alternative)</label>
+                <input type="text" name="qr_code" placeholder="tz.go.bot.tips ...">
+                <div style="font-size:11px;color:var(--ink-soft);margin-top:4px;">Provide either Lipa Namba + Provider Code OR TanQR, not both.</div>
+            </div>
+            <div id="verifyResultLipa" class="verify-box"></div>
+            <div class="form-row" style="margin-top:14px;">
+                <div class="field">
+                    <label>Amount (TZS) *</label>
+                    <input type="number" step="0.01" min="1000" name="amount" placeholder="500000" required>
+                </div>
+                <div class="field">
+                    <label>Currency</label>
+                    <select name="currency"><option value="TZS">TZS</option><option value="USD">USD</option></select>
+                </div>
+            </div>
+            <div class="field">
+                <label>Notes</label>
+                <textarea name="notes" rows="2" placeholder="Reason"></textarea>
+            </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;position:sticky;top:88px;">
+            <div class="form-card" style="background:var(--sand-50);">
+                <h4 style="margin:0 0 8px;font-size:13px;">Live Lipa Preview</h4>
+                <div style="font-size:12px;color:var(--ink-soft);">Preview via <code style="background:var(--white);padding:2px 6px;border-radius:6px;">preview-lipa-namba-payout</code> validates Lipa Namba and returns beneficiary name.</div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:15px;">Submit Lipa Namba →</button>
+        </div>
+    </div>
+</form>
+@endsection
+
+@section('scripts')
+<script>
+    function switchPayoutTab(tab){
+        document.querySelectorAll('.method-card').forEach(c=> c.classList.toggle('active', c.dataset.method===tab));
+        document.getElementById('payoutFormSimu').style.display = tab==='simu' ? 'block' : 'none';
+        document.getElementById('payoutFormBank').style.display = tab==='bank' ? 'block' : 'none';
+        document.getElementById('payoutFormLipa').style.display = tab==='lipa' ? 'block' : 'none';
+    }
+    function fmt(n){ return 'TZS ' + Number(n).toLocaleString('en-US',{maximumFractionDigits:2}); }
+    async function verifyAccountSimu(){
+        const account = document.getElementById('beneficiaryAccountSimu').value.trim();
+        const resultEl = document.getElementById('verifyResultSimu');
+        if(!account){ toast('Enter phone number first','error'); return; }
+        resultEl.style.display='flex'; resultEl.className='verify-box'; resultEl.style.background='var(--sand-100)'; resultEl.style.color='var(--ink-soft)'; resultEl.textContent='Verifying via ClickPesa live...';
+        try {
+            const r = await fetch('{{ route('payouts.verify-account') }}', {
+                method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'},
+                body: JSON.stringify({ phoneNumber: account, amount: 1000, orderReference: 'VERIFY'+Date.now(), method: 'mobile_money' })
+            });
+            const data = await r.json();
+            if(data.success){
+                resultEl.className='verify-box ok'; resultEl.style.display='flex';
+                resultEl.innerHTML='✓ Verified: <strong>'+(data.accountName||'Valid')+'</strong> · '+(data.channelProvider||'');
+                const nameInput = document.querySelector('#payoutFormSimu input[name=\"beneficiary_name\"]');
+                if(nameInput && !nameInput.value.trim() && data.accountName) nameInput.value=data.accountName;
+            } else {
+                resultEl.className='verify-box err'; resultEl.style.display='flex'; resultEl.textContent='✕ '+ (data.error||'Failed');
+            }
+        } catch(e){ resultEl.className='verify-box err'; resultEl.style.display='flex'; resultEl.textContent='Network error: '+e.message; }
+    }
+    async function verifyAccountBank(){
+        const account = document.getElementById('beneficiaryAccountBank').value.trim();
+        const resultEl = document.getElementById('verifyResultBank');
+        if(!account){ toast('Enter account number first','error'); return; }
+        resultEl.style.display='flex'; resultEl.textContent='Verifying via ClickPesa Bank Preview...';
+        try {
+            const bic = document.querySelector('#payoutFormBank input[name=\"bic\"]')?.value || 'CRDBTZTZ';
+            const r = await fetch('{{ route('payouts.verify-account') }}', {
+                method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'},
+                body: JSON.stringify({ accountNumber: account, bic: bic, amount: 1000, orderReference: 'VERIFY'+Date.now(), method: 'bank' })
+            });
+            const data = await r.json();
+            if(data.success){
+                resultEl.className='verify-box ok'; resultEl.innerHTML='✓ Verified: <strong>'+(data.accountName||'Valid')+'</strong> · '+ (data.channelProvider||'') +' · '+(data.nameLookupStatus||'RESOLVED');
+                const nameInput = document.querySelector('#payoutFormBank input[name=\"beneficiary_name\"]');
+                if(nameInput && !nameInput.value.trim() && data.accountName) nameInput.value=data.accountName;
+            } else {
+                resultEl.className='verify-box err'; resultEl.textContent='✕ '+ (data.error||'Failed');
+            }
+        } catch(e){ resultEl.className='verify-box err'; resultEl.textContent='Network error: '+e.message; }
+    }
+    async function verifyAccountLipa(){
+        const lipa = document.getElementById('beneficiaryAccountLipa').value.trim();
+        const resultEl = document.getElementById('verifyResultLipa');
+        if(!lipa){ toast('Enter Lipa Namba first','error'); return; }
+        resultEl.style.display='flex'; resultEl.textContent='Verifying via ClickPesa Lipa Preview...';
+        try {
+            const providerCode = document.querySelector('#payoutFormLipa input[name=\"provider_code\"]')?.value || '503';
+            const r = await fetch('{{ route('payouts.verify-account') }}', {
+                method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':'{{ csrf_token() }}','Accept':'application/json'},
+                body: JSON.stringify({ lipaNamba: lipa, providerCode: providerCode, amount: 1000, orderReference: 'VERIFY'+Date.now(), method: 'lipa_namba' })
+            });
+            const data = await r.json();
+            if(data.success){
+                resultEl.className='verify-box ok'; resultEl.innerHTML='✓ Verified: <strong>'+(data.accountName||'Valid')+'</strong>';
+                const nameInput = document.querySelector('#payoutFormLipa input[name=\"beneficiary_name\"]');
+                if(nameInput && !nameInput.value.trim() && data.accountName) nameInput.value=data.accountName;
+            } else {
+                resultEl.className='verify-box err'; resultEl.textContent='✕ '+ (data.error||'Failed');
+            }
+        } catch(e){ resultEl.className='verify-box err'; resultEl.textContent='Network error: '+e.message; }
+    }
+    switchPayoutTab('simu');
+    document.querySelectorAll('[data-payout-form]').forEach(f=>{
+        f.addEventListener('submit', e=>{
+            e.preventDefault();
+            submitForm(f,{method:'POST', done:(d)=>{
+                toast(d.message||'Payout submitted','success');
+                setTimeout(()=>{ window.location.href=d.redirect || '{{ route("payouts.index") }}'; },700);
+            }});
+        });
+    });
+</script>
+@endsection
